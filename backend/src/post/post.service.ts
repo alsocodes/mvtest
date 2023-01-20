@@ -1,8 +1,20 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import { CreatePostDTO } from './dto/create-post.dto';
 import { UpdatePostDTO } from './dto/update-post.dto';
+
+interface GetAll {
+  take: number;
+  skip: number;
+  search?: string;
+  searchBy?: string;
+  userId?: number;
+}
 
 @Injectable()
 export class PostService {
@@ -52,7 +64,8 @@ export class PostService {
         throw new NotFoundException('Data not found');
       }
 
-      const post = await this.findById(postId);
+      const postIdInt = typeof postId === 'string' ? parseInt(postId) : postId;
+      const post = await this.findById(postIdInt);
       if (!post || post.userId !== user.id) {
         throw new NotFoundException('Data not found');
       }
@@ -63,7 +76,7 @@ export class PostService {
         userId: x,
         ...updatePost
       } = await this.prismaService.post.update({
-        where: { id: postId },
+        where: { id: postIdInt },
         data: { caption, image, tags },
       });
 
@@ -77,17 +90,18 @@ export class PostService {
         },
       };
     } catch (error) {
-      throw error();
+      throw error;
     }
   }
 
   async delete(postId: number, userId: number) {
     try {
-      const post = await this.findById(postId);
+      const postIdInt = typeof postId === 'string' ? parseInt(postId) : postId;
+      const post = await this.findById(postIdInt);
       if (!post || post?.userId !== userId) {
         throw new NotFoundException('Data not found');
       }
-      await this.prismaService.post.delete({ where: { id: postId } });
+      await this.prismaService.post.delete({ where: { id: postIdInt } });
     } catch (error) {
       throw error;
     }
@@ -95,7 +109,8 @@ export class PostService {
 
   async like(postId: number, userId: number) {
     try {
-      const post = await this.findById(postId);
+      const postIdInt = typeof postId === 'string' ? parseInt(postId) : postId;
+      const post = await this.findById(postIdInt);
       if (!post) {
         throw new NotFoundException('Data not found');
       }
@@ -105,9 +120,18 @@ export class PostService {
         throw new NotFoundException('Data not found');
       }
 
-      await this.prismaService.userLiked.create({ data: { userId, postId } });
+      const check = await this.prismaService.userLiked.findUnique({
+        where: { postId_userId: { userId, postId: postIdInt } },
+      });
+      if (check) {
+        throw new BadRequestException('Post has been liked');
+      }
+
+      await this.prismaService.userLiked.create({
+        data: { userId, postId: postIdInt },
+      });
       await this.prismaService.post.update({
-        where: { id: postId },
+        where: { id: postIdInt },
         data: {
           likes: post.likes + 1,
         },
@@ -119,7 +143,8 @@ export class PostService {
 
   async unLike(postId: number, userId: number) {
     try {
-      const post = await this.findById(postId);
+      const postIdInt = typeof postId === 'string' ? parseInt(postId) : postId;
+      const post = await this.findById(postIdInt);
       if (!post) {
         throw new NotFoundException('Data not found');
       }
@@ -129,12 +154,19 @@ export class PostService {
         throw new NotFoundException('Data not found');
       }
 
+      const check = await this.prismaService.userLiked.findUnique({
+        where: { postId_userId: { userId, postId: postIdInt } },
+      });
+      if (!check) {
+        throw new BadRequestException('Post has not been liked');
+      }
+
       await this.prismaService.userLiked.delete({
-        where: { postId_userId: { userId, postId } },
+        where: { postId_userId: { userId, postId: postIdInt } },
       });
 
       await this.prismaService.post.update({
-        where: { id: postId },
+        where: { id: postIdInt },
         data: {
           likes: post.likes - 1,
         },
@@ -144,7 +176,7 @@ export class PostService {
     }
   }
 
-  async getAll({ take, skip, searchBy, search, userId }) {
+  async getAll({ take, skip, searchBy, search, userId }: GetAll) {
     try {
       let where = {};
       if (userId) {
