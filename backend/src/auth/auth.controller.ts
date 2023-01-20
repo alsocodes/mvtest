@@ -1,5 +1,22 @@
-import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  FileTypeValidator,
+  MaxFileSizeValidator,
+  ParseFilePipe,
+  Post,
+  Request,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { diskStorage } from 'multer';
+import * as path from 'path';
+import * as sharp from 'sharp';
+import * as fs from 'fs';
+import { SharpPipe } from 'src/utils/sharp-pipe';
 import { AuthService } from './auth.service';
 import { PublicRoute } from './constants';
 import { LoginDTO } from './dto/login.dto';
@@ -36,6 +53,49 @@ export class AuthController {
       message: 'Successfully logged in',
       data: {
         token,
+      },
+    };
+  }
+
+  @PublicRoute()
+  @Post('upload')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads/',
+        filename(req, file, callback) {
+          callback(null, `${Date.now()}.png`);
+        },
+      }),
+    }),
+  )
+  async uploadFile(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1000000 }), //1MB
+          new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+  ) {
+    const dirUploads = path.join(__dirname, '../../uploads');
+    const filepath = `${dirUploads}/${file.filename}`;
+    const renamefile = `${Date.now()}.png`;
+    await sharp(filepath)
+      .resize(300, 300)
+      .png({ effort: 3, quality: 100 })
+      .toFile(`${dirUploads}/${renamefile}`);
+
+    fs.unlinkSync(filepath);
+
+    const apiUrl = process.env.API_URL || 'http://localhost:9000';
+    return {
+      succes: true,
+      message: 'File succesfully uploaded',
+      data: {
+        link: `${apiUrl}/uploads/${renamefile}`,
       },
     };
   }

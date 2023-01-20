@@ -1,6 +1,10 @@
 // src/prisma/prisma.service.ts
 
-import { INestApplication, Injectable } from '@nestjs/common';
+import {
+  INestApplication,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 
 @Injectable()
@@ -22,6 +26,8 @@ export class PrismaService extends PrismaClient {
       where,
       _count: { id: true },
     });
+
+    if (count._count.id < 1) throw new NotFoundException('Data not found');
 
     const results = await table.findMany({ ...object, where });
 

@@ -1,6 +1,6 @@
 import { IsEmail, IsNotEmpty } from 'class-validator';
 
-export class RegisterDTO {
+export class UpdateUserDTO {
   @IsNotEmpty({ message: 'Name is required' })
   name: string;
 
@@ -10,9 +10,6 @@ export class RegisterDTO {
   @IsNotEmpty({ message: 'Email is required' })
   @IsEmail({}, { message: 'Email format is not valid' })
   email: string;
-
-  @IsNotEmpty({ message: 'Password is required' })
-  password: string;
 
   @IsNotEmpty({ message: 'Photo is required' })
   photo: string;

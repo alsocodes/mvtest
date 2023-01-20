@@ -29,7 +29,7 @@ model Post {
   userId    Int
   caption   String      @db.VarChar()
   tags      String      @db.VarChar()
-  likes     Int
+  likes     Int         @default(0)
   image     String      @db.VarChar()
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt

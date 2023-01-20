@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   ConflictException,
-  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -46,7 +45,8 @@ export class ErrorHandling {
     if (error instanceof NotFoundException)
       throw new NotFoundException(error.message || 'Data tidak ditemukan');
 
-    console.log(error);
-    throw new InternalServerErrorException('Terjadi kesalahan');
+    throw error;
+    // console.log(error);
+    // throw new InternalServerErrorException('Terjadi kesalahan');
   }
 }
