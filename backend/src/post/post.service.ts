@@ -182,7 +182,7 @@ export class PostService {
       if (userId) {
         where = {
           ...where,
-          userId,
+          userId: Number(userId),
         };
       }
       if (search && searchBy) {

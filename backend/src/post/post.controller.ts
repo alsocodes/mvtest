@@ -2,18 +2,26 @@ import {
   Body,
   Controller,
   Delete,
+  FileTypeValidator,
   Get,
-  NotFoundException,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   Post,
   Put,
   Query,
   Request,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDTO } from './dto/create-post.dto';
-import { UserService } from 'src/user/user.service';
 import { QueryDTO } from './dto/query.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import * as path from 'path';
+import * as sharp from 'sharp';
+import * as fs from 'fs';
 
 @Controller('post')
 export class PostController {
@@ -110,7 +118,7 @@ export class PostController {
       const take = Number(limit) || 20;
       const skip = Number((page - 1) * take);
 
-      const posts = await this.postService.getAll({
+      const { rows, count } = await this.postService.getAll({
         take,
         skip,
         searchBy,
@@ -120,10 +128,87 @@ export class PostController {
       return {
         success: true,
         message: 'Successfully Get Post',
-        data: posts,
+        data: rows,
+        pagination: {
+          total: count,
+          page,
+          limit,
+        },
       };
     } catch (error) {
       throw error;
     }
+  }
+
+  @Get('/user/:id')
+  async getAllByUser(@Query() query: QueryDTO, @Param('id') userId: number) {
+    try {
+      const { page, limit, searchBy, search } = query;
+      const take = Number(limit) || 20;
+      const skip = Number((page - 1) * take);
+
+      const { rows, count } = await this.postService.getAll({
+        take,
+        skip,
+        searchBy,
+        search,
+        userId,
+      });
+
+      return {
+        success: true,
+        message: 'Successfully Get Post',
+        data: rows,
+        pagination: {
+          total: count,
+          page,
+          limit,
+        },
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Post('upload')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads/',
+        filename(req, file, callback) {
+          callback(null, `${Date.now()}.png`);
+        },
+      }),
+    }),
+  )
+  async uploadFile(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1000000 }), //1MB
+          new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+  ) {
+    const dirUploads = path.join(__dirname, '../../uploads');
+    const filepath = `${dirUploads}/${file.filename}`;
+    const renamefile = `${Date.now()}.png`;
+    await sharp(filepath)
+      .resize(600, 600)
+      .png({ effort: 3, quality: 100 })
+      .toFile(`${dirUploads}/${renamefile}`);
+
+    fs.unlinkSync(filepath);
+
+    const apiUrl = process.env.API_URL || 'http://localhost:9001';
+    return {
+      succes: true,
+      message: 'File succesfully uploaded',
+      data: {
+        link: `${apiUrl}/uploads/${renamefile}`,
+      },
+    };
   }
 }

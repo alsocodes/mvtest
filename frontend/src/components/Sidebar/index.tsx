@@ -2,7 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { IoHomeOutline, IoLogOutOutline } from 'react-icons/io5';
 import { IconType } from 'react-icons';
-import { selectConfig, useAppSelector } from '../../app/hooks';
+import { selectConfig, useAppDispatch, useAppSelector } from '../../app/hooks';
+import { Logout } from '../../slices/AuthSlice';
 
 type Props = {
   children: JSX.Element;
@@ -24,7 +25,7 @@ export const routes: RouteInterface[] = [
     name: 'HOME',
     title: '',
     label: '',
-    path: '/home',
+    path: '/',
     icon: IoHomeOutline,
   },
   {
@@ -75,6 +76,10 @@ const SidebarItem = ({ active, route, hideLabel }: any) => {
 
 const Sidebar = ({ children }: Props) => {
   const { menuActive } = useAppSelector(selectConfig);
+  const dispatch = useAppDispatch();
+  const OnLogoutPress = () => {
+    dispatch(Logout());
+  };
 
   return (
     <div className='flex min-h-screen bg-base-100 text-base-content w-full'>
@@ -96,7 +101,10 @@ const Sidebar = ({ children }: Props) => {
               );
             })}
           </ul>
-          <button className={`btn btn-ghost w-full rounded-lg`}>
+          <button
+            className={`btn btn-ghost w-full rounded-lg`}
+            onClick={() => OnLogoutPress()}
+          >
             <IoLogOutOutline />
             <span className='ml-3'>Logout</span>
           </button>

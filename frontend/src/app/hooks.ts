@@ -8,3 +8,4 @@ export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 export const selectAuth = (state: RootState) => state.auth;
 export const selectConfig = (state: RootState) => state.config;
 export const selectHome = (state: RootState) => state.home;
+export const selectPost = (state: RootState) => state.post;

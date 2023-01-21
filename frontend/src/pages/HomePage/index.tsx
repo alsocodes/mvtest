@@ -1,8 +1,11 @@
 import React, { useEffect } from 'react';
 import { IoWarningOutline } from 'react-icons/io5';
 import { selectHome, useAppDispatch, useAppSelector } from '../../app/hooks';
+import CardPost from '../../components/CardPost';
+import Pagination from '../../components/Pagination';
 import { SetMenuActive } from '../../slices/ConfigSlice';
-import { Post } from '../../slices/HomeSlice';
+import { GetPosts } from '../../slices/HomeSlice';
+import { Post } from '../../slices/PostSlice';
 
 type Props = {
   name: string;
@@ -10,12 +13,17 @@ type Props = {
 
 const HomePage = ({ name }: Props) => {
   const dispatch = useAppDispatch();
-  const { data, total, page, limit } = useAppSelector(selectHome);
+  const { data, pagination } = useAppSelector(selectHome);
 
   useEffect(() => {
     dispatch(SetMenuActive(name));
   }, [dispatch, name]);
 
+  useEffect(() => {
+    dispatch(GetPosts({ page: 1, limit: 8 }));
+  }, [dispatch]);
+
+  const OnPaginationAction = () => {};
   return (
     <div className='h-full w-full'>
       <div>
@@ -25,7 +33,7 @@ const HomePage = ({ name }: Props) => {
           className='input w-full max-w-xs input-bordered'
         />
       </div>
-      {total === 0 ? (
+      {pagination?.total === 0 ? (
         <div className='flex gap-4 justify-center align-middle items-center h-full'>
           <IoWarningOutline size={40} />
           <span className='text-2xl text-error'>No Data Availabel</span>
@@ -33,15 +41,12 @@ const HomePage = ({ name }: Props) => {
       ) : (
         // </div>
         <div>
-          <div className='flex flex-wrap  w-full max-w-full border-red-500 overflow-hidden border'>
-            {data?.map(({ caption, image, like, tags }: Post) => {
-              return (
-                <div className='border rounded-md w-1/4'>
-                  <img src={image} />
-                </div>
-              );
+          <div className='mt-6 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8'>
+            {data?.map((row: Post) => {
+              return <CardPost {...row} />;
             })}
           </div>
+          <Pagination {...pagination} action={OnPaginationAction} />
         </div>
       )}
     </div>

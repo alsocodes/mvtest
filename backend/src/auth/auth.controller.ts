@@ -16,7 +16,6 @@ import { diskStorage } from 'multer';
 import * as path from 'path';
 import * as sharp from 'sharp';
 import * as fs from 'fs';
-import { SharpPipe } from 'src/utils/sharp-pipe';
 import { AuthService } from './auth.service';
 import { PublicRoute } from './constants';
 import { LoginDTO } from './dto/login.dto';
@@ -90,7 +89,7 @@ export class AuthController {
 
     fs.unlinkSync(filepath);
 
-    const apiUrl = process.env.API_URL || 'http://localhost:9000';
+    const apiUrl = process.env.API_URL || 'http://localhost:9001';
     return {
       succes: true,
       message: 'File succesfully uploaded',

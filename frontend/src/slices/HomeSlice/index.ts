@@ -1,4 +1,6 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { Post } from '../PostSlice';
+import HttpCall from '../../utils/HttpCall';
 
 export type User = {
   name: string;
@@ -7,160 +9,53 @@ export type User = {
   photo: string;
 };
 
-export type Post = {
-  id: number;
-  image: string;
-  caption: string;
-  tags: string;
-  like: number;
-  createdAt: string;
-  updatedAt: string;
-  user: User;
-};
-
 export type HomeState = {
   loading: boolean;
   data: Post[];
-  total: number;
-  page: number;
-  limit: number;
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+  };
 };
-
-const dummies: Post[] = [
-  {
-    id: 1,
-    image:
-      'https://source.unsplash.com/random/800x800/?wallpaper,landscape,technology',
-    caption: 'Dont be affraid you can do it',
-    tags: '#motive #believe',
-    like: 777,
-    createdAt: '',
-    updatedAt: '',
-    user: {
-      email: 'also@gmail.com',
-      name: 'also',
-      username: 'also',
-      photo:
-        'https://source.unsplash.com/random/800x800/?wallpaper,landscape,technology',
-    },
-  },
-  {
-    id: 1,
-    image:
-      'https://source.unsplash.com/random/800x800/?wallpaper,landscape,technology',
-    caption: 'Dont be affraid you can do it',
-    tags: '#motive #believe',
-    like: 777,
-    createdAt: '',
-    updatedAt: '',
-    user: {
-      email: 'also@gmail.com',
-      name: 'also',
-      username: 'also',
-      photo:
-        'https://source.unsplash.com/random/800x800/?wallpaper,landscape,technology',
-    },
-  },
-  {
-    id: 1,
-    image:
-      'https://source.unsplash.com/random/800x800/?wallpaper,landscape,technology',
-    caption: 'Dont be affraid you can do it',
-    tags: '#motive #believe',
-    like: 777,
-    createdAt: '',
-    updatedAt: '',
-    user: {
-      email: 'also@gmail.com',
-      name: 'also',
-      username: 'also',
-      photo:
-        'https://source.unsplash.com/random/800x800/?wallpaper,landscape,technology',
-    },
-  },
-  {
-    id: 1,
-    image:
-      'https://source.unsplash.com/random/800x800/?wallpaper,landscape,technology',
-    caption: 'Dont be affraid you can do it',
-    tags: '#motive #believe',
-    like: 777,
-    createdAt: '',
-    updatedAt: '',
-    user: {
-      email: 'also@gmail.com',
-      name: 'also',
-      username: 'also',
-      photo:
-        'https://source.unsplash.com/random/800x800/?wallpaper,landscape,technology',
-    },
-  },
-  {
-    id: 1,
-    image:
-      'https://source.unsplash.com/random/800x800/?wallpaper,landscape,technology',
-    caption: 'Dont be affraid you can do it',
-    tags: '#motive #believe',
-    like: 777,
-    createdAt: '',
-    updatedAt: '',
-    user: {
-      email: 'also@gmail.com',
-      name: 'also',
-      username: 'also',
-      photo:
-        'https://source.unsplash.com/random/800x800/?wallpaper,landscape,technology',
-    },
-  },
-  {
-    id: 1,
-    image:
-      'https://source.unsplash.com/random/800x800/?wallpaper,landscape,technology',
-    caption: 'Dont be affraid you can do it',
-    tags: '#motive #believe',
-    like: 777,
-    createdAt: '',
-    updatedAt: '',
-    user: {
-      email: 'also@gmail.com',
-      name: 'also',
-      username: 'also',
-      photo:
-        'https://source.unsplash.com/random/800x800/?wallpaper,landscape,technology',
-    },
-  },
-  {
-    id: 1,
-    image:
-      'https://source.unsplash.com/random/800x800/?wallpaper,landscape,technology',
-    caption: 'Dont be affraid you can do it',
-    tags: '#motive #believe',
-    like: 777,
-    createdAt: '',
-    updatedAt: '',
-    user: {
-      email: 'also@gmail.com',
-      name: 'also',
-      username: 'also',
-      photo:
-        'https://source.unsplash.com/random/800x800/?wallpaper,landscape,technology',
-    },
-  },
-];
 
 const initialState: HomeState = {
   loading: false,
-  data: dummies,
-  total: dummies?.length,
-  page: 1,
-  limit: 10,
+  data: [],
+  pagination: {
+    page: 0,
+    limit: 0,
+    total: 0,
+  },
 };
+
+export const GetPosts = createAsyncThunk(
+  'post/getPosts',
+  async (query: any) => {
+    const { data, pagination } = (
+      await HttpCall.get(`/post`, { params: query })
+    ).data;
+    return { data, pagination };
+  }
+);
 
 const HomeSlice = createSlice({
   name: 'home',
   initialState,
   reducers: {},
-  extraReducers: ({ addCase }) => {},
+  extraReducers: ({ addCase }) => {
+    addCase(GetPosts.pending, (state: HomeState, _) => {
+      state.loading = true;
+    });
+    addCase(GetPosts.fulfilled, (state: HomeState, { payload }) => {
+      state.loading = false;
+      state.data = payload.data;
+      state.pagination = payload.pagination;
+    });
+    addCase(GetPosts.rejected, (state: HomeState, _) => {
+      state.loading = false;
+    });
+  },
 });
 
 export default HomeSlice.reducer;
