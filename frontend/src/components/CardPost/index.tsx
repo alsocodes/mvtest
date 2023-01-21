@@ -3,13 +3,14 @@ import { IoHeartOutline, IoHeartSharp } from 'react-icons/io5';
 import { Post } from '../../slices/PostSlice';
 
 const CardPost = ({
+  id,
   caption,
   image,
   likes,
   tags,
   user,
   liked,
-  hasAction,
+  action,
 }: Post) => {
   return (
     <div className='border rounded-md overflow-hidden'>
@@ -28,11 +29,31 @@ const CardPost = ({
               {caption}
             </p>
           </div>
-          {hasAction && (
+          {action && (
             <div className='flex-shrink-0'>
               <div className='flex flex-col gap-1'>
-                <button className='btn btn-xs btn-outline'>delete</button>
-                <button className='btn btn-xs btn-outline'>edit</button>
+                <button
+                  className='btn btn-xs btn-outline'
+                  onClick={() =>
+                    action({
+                      type: 'delete',
+                      data: { id, caption, image, tags },
+                    })
+                  }
+                >
+                  delete
+                </button>
+                <button
+                  className='btn btn-xs btn-outline'
+                  onClick={() =>
+                    action({
+                      type: 'edit',
+                      data: { id, caption, image, tags },
+                    })
+                  }
+                >
+                  edit
+                </button>
               </div>
             </div>
           )}

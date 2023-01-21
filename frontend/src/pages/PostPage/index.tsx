@@ -4,6 +4,7 @@ import { IoAddSharp, IoImageOutline, IoWarningOutline } from 'react-icons/io5';
 import { selectPost, useAppDispatch, useAppSelector } from '../../app/hooks';
 import CardPost from '../../components/CardPost';
 import Pagination from '../../components/Pagination';
+import Search from '../../components/Search';
 import TextInput from '../../components/TextInput';
 import { SetMenuActive } from '../../slices/ConfigSlice';
 import {
@@ -34,14 +35,25 @@ const PostPage = ({ name }: Props) => {
     dispatch(SetMenuActive(name));
   }, [dispatch, name]);
 
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const [searchBy, setSearchBy] = useState('');
+  const inputFileRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
-    dispatch(GetPosts({ page: 1, limit: 8 }));
+    dispatch(GetPosts({ page: page, limit: 8, search, searchBy }));
     setModalForm(null);
-  }, [formResult, dispatch]);
+    if (inputFileRef.current) {
+      inputFileRef.current.value = '';
+    }
+  }, [formResult, dispatch, page, search, searchBy]);
 
-  const OnPaginationAction = () => {};
+  const OnPaginationAction = (p: number) => {
+    // console.log(p);
+    setPage(p);
+  };
 
   const [modalForm, setModalForm] = useState<null | Post | any>(null);
+  const [modalDelete, setModalDelete] = useState<null | Post | any>(null);
 
   const {
     register,
@@ -53,7 +65,6 @@ const PostPage = ({ name }: Props) => {
     formState: { errors },
   } = useForm<IFormPost>();
 
-  const inputFileRef = useRef<HTMLInputElement>(null);
   const [dispImage, setDispImage] = useState<any>(null);
   const browseFile = () => {
     if (inputFileRef.current) {
@@ -126,8 +137,25 @@ const PostPage = ({ name }: Props) => {
     setValue('caption', modalForm?.caption || '');
     setValue('tags', modalForm?.tags || '');
     setValue('image', modalForm?.image || '');
+    if (modalForm?.image) setDispImage(modalForm?.image);
   }, [modalForm, setValue]);
 
+  const OnSearch = ({ searchBy, search }: any) => {
+    // console.log(searchBy, search);
+    setSearch(search);
+    setSearchBy(searchBy);
+  };
+
+  const CardAction = ({ type, data }: any) => {
+    const { id, caption, tags, image } = data;
+    if (type === 'edit') {
+      setModalForm({ id, caption, tags, image });
+    }
+
+    if (type === 'delete') {
+      setModalDelete({ id, caption, tags, image });
+    }
+  };
   return (
     <div className='h-full w-full relative'>
       <button
@@ -136,29 +164,58 @@ const PostPage = ({ name }: Props) => {
       >
         <IoAddSharp />
       </button>
-      <div>
-        <input
-          type='text'
-          placeholder='Search by Tag or Caption'
-          className='input w-full max-w-xs input-bordered'
-        />
-      </div>
-      {pagination?.total === 0 ? (
-        <div className='flex gap-4 justify-center align-middle items-center h-full'>
-          <IoWarningOutline size={40} />
-          <span className='text-2xl text-error'>No Data Availabel</span>
+      <div className='flex flex-col justify-between h-full overflow-hidden'>
+        <div className='mb-3 p-1 w-full max-w-xs'>
+          <Search action={OnSearch} />
         </div>
-      ) : (
-        // </div>
-        <div>
-          <div className='mt-6 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8'>
-            {data?.map((row: Post) => {
-              return <CardPost key={row.id} {...row} hasAction={true} />;
-            })}
+        {pagination?.total === 0 ? (
+          <div className='flex gap-4 justify-center align-middle items-center h-full'>
+            <IoWarningOutline size={40} />
+            <span className='text-2xl text-error'>No Data Availabel</span>
           </div>
-          <Pagination {...pagination} action={OnPaginationAction} />
+        ) : (
+          <>
+            <div className='flex-grow h-80 overflow-y-auto pr-4'>
+              <div className='grid grid-cols-1 gap-y-6 gap-x-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8'>
+                {data?.map((row: Post) => {
+                  return <CardPost key={row.id} {...row} action={CardAction} />;
+                })}
+              </div>
+            </div>
+            <Pagination {...pagination} action={OnPaginationAction} />
+          </>
+        )}
+      </div>
+
+      <input
+        type='checkbox'
+        id='my-modal-delete'
+        className='modal-toggle'
+        checked={modalDelete !== null}
+        onChange={() => console.log('ok')}
+      />
+      <div className='modal'>
+        <div className='modal-box'>
+          <div className='py-4 text-center'>
+            Are you sure want to delete this data ?
+          </div>
+          <div className='modal-action justify-center'>
+            <button
+              type='button'
+              className='btn btn-ghost btn-md'
+              onClick={() => setModalDelete(null)}
+            >
+              No
+            </button>
+            <button
+              type='submit'
+              className={`btn btn-primary btn-md ${loading && 'loading'}`}
+            >
+              Yes
+            </button>
+          </div>
         </div>
-      )}
+      </div>
 
       <input
         type='checkbox'

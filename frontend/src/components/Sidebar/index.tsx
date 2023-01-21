@@ -65,10 +65,10 @@ const SidebarItem = ({ active, route, hideLabel }: any) => {
     <li className='my-px' key={name}>
       <Link
         to={path}
-        className={`cursor-pointer flex justify-center items-center h-10 px-3 rounded-lg my-2 ${isActive}`}
+        className={`cursor-pointer flex justify-center h-10 px-3 rounded-lg my-2 ${isActive}`}
       >
         {Icon && <Icon fontSize={24} />}
-        <span className={`${hideLabel && 'hidden'}`}>{label}</span>
+        {label && <span className={`${hideLabel && 'hidden'}`}>{label}</span>}
       </Link>
     </li>
   );
@@ -82,11 +82,11 @@ const Sidebar = ({ children }: Props) => {
   };
 
   return (
-    <div className='flex min-h-screen bg-base-100 text-base-content w-full'>
+    <div className='flex h-full border border-red-400 bg-base-100 text-base-content w-full'>
       <aside
         className={`
           flex-shrink-0
-          w-44 md:w-60 bg-base-300 sidebar transition-all duration-300 ease-in-out overflow-hidden`}
+          w-60 bg-base-300 sidebar transition-all duration-300 ease-in-out overflow-hidden`}
       >
         <div className='sidebar-content px-4 py-2 h-full flex flex-col justify-between'>
           <ul className='menu flex flex-col w-full'>
@@ -112,7 +112,7 @@ const Sidebar = ({ children }: Props) => {
       </aside>
       {/* flexx flex-colx */}
       <main className='main flex-grow transition-all duration-150 ease-in'>
-        <div className='main-content px-8 py-8 border h-full'>{children}</div>
+        <div className='main-content px-12 py-6 border h-full'>{children}</div>
       </main>
     </div>
   );

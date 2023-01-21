@@ -92,7 +92,7 @@ const App = () => {
 
 const MainLayout = () => {
   return (
-    <div className='h-screen'>
+    <div className='h-screen overflow-hidden'>
       <Sidebar>
         <Routes>
           <Route path='/' element={<HomePage name='HOME' />} />

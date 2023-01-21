@@ -13,7 +13,7 @@ export type Post = {
   createdAt: string;
   updatedAt: string;
   user: User;
-  hasAction: boolean;
+  action: any | null;
 };
 
 export type PostState = {
@@ -47,7 +47,11 @@ export const GetPosts = createAsyncThunk(
   async (query: any, { getState }: any) => {
     const { token } = getState().auth;
     const decoded: any = jwt_decode(token);
-    // console.log(decoded);
+    // query.search = query.search.replace('#', '');
+    if (query.search === '') delete query.search;
+    if (query.searchBy === '') delete query.searchBy;
+    // if(query.searchBy === )
+    console.log(query);
     const userId = decoded?.sub;
     const { data, pagination } = (
       await HttpCall.get(`/post/user/${userId}`, { params: query })

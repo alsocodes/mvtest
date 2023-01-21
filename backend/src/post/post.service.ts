@@ -216,6 +216,7 @@ export class PostService {
         where,
         take: take,
         skip: skip,
+        orderBy: { id: 'desc' },
       });
     } catch (error) {
       throw error;
