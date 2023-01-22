@@ -14,6 +14,7 @@ interface GetAll {
   search?: string;
   searchBy?: string;
   userId?: number;
+  isOwnPost: boolean;
 }
 
 @Injectable()
@@ -176,10 +177,10 @@ export class PostService {
     }
   }
 
-  async getAll({ take, skip, searchBy, search, userId }: GetAll) {
+  async getAll({ take, skip, searchBy, search, userId, isOwnPost }: GetAll) {
     try {
       let where = {};
-      if (userId) {
+      if (isOwnPost) {
         where = {
           ...where,
           userId: Number(userId),
@@ -193,31 +194,52 @@ export class PostService {
         };
       }
 
-      return this.prismaService.findAndCountAll({
-        table: this.prismaService.post,
-        select: {
-          id: true,
-          caption: true,
-          image: true,
-          likes: true,
-          tags: true,
-          createdAt: true,
-          updatedAt: true,
-          user: {
-            select: {
-              name: true,
-              email: true,
-              username: true,
-              photo: true,
+      return this.prismaService
+        .findAndCountAll({
+          table: this.prismaService.post,
+          select: {
+            id: true,
+            caption: true,
+            image: true,
+            likes: true,
+            tags: true,
+            createdAt: true,
+            updatedAt: true,
+            user: {
+              select: {
+                name: true,
+                email: true,
+                username: true,
+                photo: true,
+              },
+            },
+            UserLiked: {
+              select: {
+                userId: true,
+              },
+              where: {
+                userId: Number(userId),
+              },
             },
           },
-        },
 
-        where,
-        take: take,
-        skip: skip,
-        orderBy: { id: 'desc' },
-      });
+          where,
+          take: take,
+          skip: skip,
+          orderBy: { id: 'desc' },
+        })
+        .then((result) => {
+          return {
+            ...result,
+            rows: result.rows.map((row: any) => {
+              const { UserLiked, ...data } = row;
+              return {
+                ...data,
+                liked: UserLiked?.length > 0,
+              };
+            }, []),
+          };
+        });
     } catch (error) {
       throw error;
     }

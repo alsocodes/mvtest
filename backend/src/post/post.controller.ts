@@ -112,17 +112,20 @@ export class PostController {
   }
 
   @Get()
-  async getAll(@Query() query: QueryDTO) {
+  async getAll(@Query() query: QueryDTO, @Request() req) {
     try {
       const { page, limit, searchBy, search } = query;
       const take = Number(limit) || 20;
       const skip = Number((page - 1) * take);
+      const { id: userId } = req.user;
 
       const { rows, count } = await this.postService.getAll({
         take,
         skip,
         searchBy,
         search,
+        userId,
+        isOwnPost: false,
       });
 
       return {
@@ -153,6 +156,7 @@ export class PostController {
         searchBy,
         search,
         userId,
+        isOwnPost: true,
       });
 
       return {

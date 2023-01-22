@@ -6,7 +6,7 @@ import {
 } from '@reduxjs/toolkit';
 import authReducer from '../slices/AuthSlice';
 import configReducer from '../slices/ConfigSlice';
-import homeReducer from '../slices/HomeSlice';
+import userReducer from '../slices/UserSlice';
 import postReducer from '../slices/PostSlice';
 
 import { persistReducer, persistStore } from 'redux-persist';
@@ -26,7 +26,7 @@ export const store = configureStore({
     combineReducers({
       auth: authReducer,
       config: configReducer,
-      home: homeReducer,
+      user: userReducer,
       post: postReducer,
     })
   ),

@@ -31,7 +31,7 @@ const App = () => {
     switch (type) {
       case 'error':
         toast.error(message, {
-          position: 'bottom-right',
+          position: 'top-right',
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
@@ -44,7 +44,7 @@ const App = () => {
 
       case 'success':
         toast.success(message, {
-          position: 'bottom-right',
+          position: 'top-right',
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,

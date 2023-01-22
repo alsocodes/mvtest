@@ -153,7 +153,7 @@ const RegisterPage = () => {
   }, [linkUploaded, setValue]);
   return (
     <section className='h-screen'>
-      <div className='flex justify-center items-center flex-wrap h-full g-6'>
+      <div className='flex justify-center items-center flex-wrap h-full g-6 py-4'>
         <div className='w-full max-w-lg py-10 px-20 border border-primary rounded-lg'>
           <div className='items-center justify-center flex w-full h-full flex-grow'>
             <form className='w-full' onSubmit={handleSubmit(formSubmit)}>
@@ -216,10 +216,10 @@ const RegisterPage = () => {
                   Register
                 </button>
                 <Link
-                  to={'/register'}
+                  to={'/login'}
                   className='text-sm link link-hover link-primary'
                 >
-                  Register
+                  Login
                 </Link>
               </div>
             </form>

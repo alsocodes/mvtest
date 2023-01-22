@@ -9,10 +9,14 @@ import TextInput from '../../components/TextInput';
 import { SetMenuActive } from '../../slices/ConfigSlice';
 import {
   ClearLink,
+  DeleteDelPost,
   GetPosts,
   Post,
   PostCreatePost,
   PostUpload,
+  PutLikePost,
+  PutUnLikePost,
+  PutUpdatePost,
 } from '../../slices/PostSlice';
 import { createFormData } from '../../utils/Helper';
 
@@ -48,7 +52,6 @@ const PostPage = ({ name }: Props) => {
   }, [formResult, dispatch, page, search, searchBy]);
 
   const OnPaginationAction = (p: number) => {
-    // console.log(p);
     setPage(p);
   };
 
@@ -129,11 +132,15 @@ const PostPage = ({ name }: Props) => {
   }, [linkUploaded, setValue]);
 
   const OnSubmit = (data: IFormPost) => {
-    // console.log(data);
-    dispatch(PostCreatePost(data));
+    if (!data.id) {
+      dispatch(PostCreatePost(data));
+    } else {
+      dispatch(PutUpdatePost(data));
+    }
   };
 
   useEffect(() => {
+    setValue('id', modalForm?.id || null);
     setValue('caption', modalForm?.caption || '');
     setValue('tags', modalForm?.tags || '');
     setValue('image', modalForm?.image || '');
@@ -155,7 +162,22 @@ const PostPage = ({ name }: Props) => {
     if (type === 'delete') {
       setModalDelete({ id, caption, tags, image });
     }
+
+    if (type === 'like') {
+      dispatch(PutLikePost(id));
+    }
+
+    if (type === 'unlike') {
+      dispatch(PutUnLikePost(id));
+    }
   };
+
+  const OnConfirmDelete = () => {
+    if (!modalDelete?.id) return;
+    dispatch(DeleteDelPost(modalDelete?.id));
+    setModalDelete(null);
+  };
+
   return (
     <div className='h-full w-full relative'>
       <button
@@ -178,7 +200,14 @@ const PostPage = ({ name }: Props) => {
             <div className='flex-grow h-80 overflow-y-auto pr-4'>
               <div className='grid grid-cols-1 gap-y-6 gap-x-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8'>
                 {data?.map((row: Post) => {
-                  return <CardPost key={row.id} {...row} action={CardAction} />;
+                  return (
+                    <CardPost
+                      key={row.id}
+                      {...row}
+                      action={CardAction}
+                      upOrDel={true}
+                    />
+                  );
                 })}
               </div>
             </div>
@@ -208,6 +237,7 @@ const PostPage = ({ name }: Props) => {
               No
             </button>
             <button
+              onClick={() => OnConfirmDelete()}
               type='submit'
               className={`btn btn-primary btn-md ${loading && 'loading'}`}
             >

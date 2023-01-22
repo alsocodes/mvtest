@@ -82,7 +82,7 @@ const Sidebar = ({ children }: Props) => {
   };
 
   return (
-    <div className='flex h-full border border-red-400 bg-base-100 text-base-content w-full'>
+    <div className='flex h-full border bg-base-100 text-base-content w-full'>
       <aside
         className={`
           flex-shrink-0

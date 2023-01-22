@@ -11,14 +11,27 @@ const CardPost = ({
   user,
   liked,
   action,
+  upOrDel,
 }: Post) => {
   return (
     <div className='border rounded-md overflow-hidden'>
       <img src={image} alt={caption} />
       <div className='p-2'>
         <div className='flex gap-1 align-middle items-center'>
-          <button className='btn btn-ghost btn-sm px-2'>
-            {liked ? <IoHeartSharp color='#f00' /> : <IoHeartOutline />}
+          <button
+            className='btn btn-ghost btn-sm px-2'
+            onClick={() =>
+              action({
+                type: liked ? 'unlike' : 'like',
+                data: { id },
+              })
+            }
+          >
+            {liked ? (
+              <IoHeartSharp color='#f00' size={20} />
+            ) : (
+              <IoHeartOutline size={20} />
+            )}
           </button>
           <span className='text-xs'>{likes}</span>
         </div>
@@ -29,7 +42,7 @@ const CardPost = ({
               {caption}
             </p>
           </div>
-          {action && (
+          {upOrDel && (
             <div className='flex-shrink-0'>
               <div className='flex flex-col gap-1'>
                 <button

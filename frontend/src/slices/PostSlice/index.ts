@@ -1,7 +1,8 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { User } from '../HomeSlice';
+import { User } from '../UserSlice';
 import HttpCall from '../../utils/HttpCall';
 import jwt_decode from 'jwt-decode';
+import { SetToastData } from '../ConfigSlice';
 
 export type Post = {
   id: number;
@@ -14,6 +15,7 @@ export type Post = {
   updatedAt: string;
   user: User;
   action: any | null;
+  upOrDel?: boolean;
 };
 
 export type PostState = {
@@ -27,6 +29,12 @@ export type PostState = {
   };
   formResult: any | null;
   linkUploaded: string;
+  allPost: Post[];
+  allPagination: {
+    total: number;
+    page: number;
+    limit: number;
+  };
 };
 
 const initialState: PostState = {
@@ -40,7 +48,25 @@ const initialState: PostState = {
     total: 0,
   },
   formResult: null,
+  allPost: [],
+  allPagination: {
+    page: 0,
+    limit: 0,
+    total: 0,
+  },
 };
+
+export const GetAllPosts = createAsyncThunk(
+  'post/getAllPosts',
+  async (query: any) => {
+    if (query.search === '') delete query.search;
+    if (query.searchBy === '') delete query.searchBy;
+    const { data, pagination } = (
+      await HttpCall.get(`/post`, { params: query })
+    ).data;
+    return { data, pagination };
+  }
+);
 
 export const GetPosts = createAsyncThunk(
   'post/getPosts',
@@ -74,8 +100,46 @@ export const PostUpload = createAsyncThunk(
 
 export const PostCreatePost = createAsyncThunk(
   'post/postCreatePost',
-  async (formData: any) => {
+  async (formData: any, { dispatch }) => {
     const result = (await HttpCall.post('/post', formData)).data;
+    dispatch(SetToastData({ type: 'success', message: result?.message }));
+    return result;
+  }
+);
+
+export const PutUpdatePost = createAsyncThunk(
+  'post/putUpdatePost',
+  async (formData: any, { dispatch }) => {
+    const { id, ...payload } = formData;
+    const result = (await HttpCall.put(`/post/${id}`, payload)).data;
+    dispatch(SetToastData({ type: 'success', message: result?.message }));
+    return result;
+  }
+);
+
+export const DeleteDelPost = createAsyncThunk(
+  'post/deleteDelPost',
+  async (id: number, { dispatch }) => {
+    const result = (await HttpCall.delete(`/post/${id}`)).data;
+    dispatch(SetToastData({ type: 'success', message: result?.message }));
+    return result;
+  }
+);
+
+export const PutLikePost = createAsyncThunk(
+  'post/putLikePost',
+  async (id: number, { dispatch }) => {
+    const result = (await HttpCall.put(`/post/like/${id}`)).data;
+    dispatch(SetToastData({ type: 'success', message: result?.message }));
+    return result;
+  }
+);
+
+export const PutUnLikePost = createAsyncThunk(
+  'post/putUnLikePost',
+  async (id: number, { dispatch }) => {
+    const result = (await HttpCall.put(`/post/unlike/${id}`)).data;
+    dispatch(SetToastData({ type: 'success', message: result?.message }));
     return result;
   }
 );
@@ -112,6 +176,35 @@ const PostSlice = createSlice({
       state.loading = false;
     });
 
+    addCase(PutUpdatePost.pending, (state: PostState, _) => {
+      state.loading = true;
+    });
+    addCase(PutUpdatePost.fulfilled, (state: PostState, { payload }) => {
+      state.loading = false;
+      state.formResult = payload;
+    });
+    addCase(PutUpdatePost.rejected, (state: PostState, _) => {
+      state.loading = false;
+    });
+
+    addCase(DeleteDelPost.pending, (state: PostState, _) => {
+      state.loading = true;
+    });
+    addCase(DeleteDelPost.fulfilled, (state: PostState, { payload }) => {
+      state.loading = false;
+      state.formResult = payload;
+    });
+    addCase(DeleteDelPost.rejected, (state: PostState, _) => {
+      state.loading = false;
+    });
+
+    addCase(PutLikePost.fulfilled, (state: PostState, { payload }) => {
+      state.formResult = payload;
+    });
+    addCase(PutUnLikePost.fulfilled, (state: PostState, { payload }) => {
+      state.formResult = payload;
+    });
+
     addCase(GetPosts.pending, (state: PostState, _) => {
       state.loading = true;
     });
@@ -122,6 +215,30 @@ const PostSlice = createSlice({
     });
     addCase(GetPosts.rejected, (state: PostState, _) => {
       state.loading = false;
+      state.data = [];
+      state.pagination = {
+        page: 0,
+        limit: 0,
+        total: 0,
+      };
+    });
+
+    addCase(GetAllPosts.pending, (state: PostState, _) => {
+      state.loading = true;
+    });
+    addCase(GetAllPosts.fulfilled, (state: PostState, { payload }) => {
+      state.loading = false;
+      state.allPost = payload.data;
+      state.allPagination = payload.pagination;
+    });
+    addCase(GetAllPosts.rejected, (state: PostState, _) => {
+      state.loading = false;
+      state.allPost = [];
+      state.allPagination = {
+        page: 0,
+        limit: 0,
+        total: 0,
+      };
     });
   },
 });

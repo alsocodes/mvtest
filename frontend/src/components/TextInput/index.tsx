@@ -20,6 +20,7 @@ export interface TextInputInterface {
   accept?: string;
   ref?: string;
   errors?: any;
+  disabled?: boolean;
 }
 
 const TextInput: FC<TextInputInterface> = ({
@@ -38,6 +39,7 @@ const TextInput: FC<TextInputInterface> = ({
   formatOptionLabel,
   accept,
   ref,
+  disabled,
   register,
   errors,
 }): JSX.Element => {
@@ -67,7 +69,9 @@ const TextInput: FC<TextInputInterface> = ({
           readOnly={readOnly}
           defaultValue={defaultValue}
           {...register}
-          className={`input input-bordered w-full ${className}`}
+          className={`input input-bordered w-full ${className} ${
+            disabled && 'input-disabled'
+          }`}
         />
       )}
       <label className='label '>

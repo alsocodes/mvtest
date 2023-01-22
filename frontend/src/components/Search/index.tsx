@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 interface Props {
   action: (object: any) => any;
@@ -40,7 +40,12 @@ const Search = ({ action }: Props) => {
           }
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
-              action({ search: onTypeSearch, searchBy: searchBy });
+              const by = onTypeSearch.startsWith('#') ? 'tag' : 'caption';
+              setSearchBy(by);
+              action({
+                search: onTypeSearch,
+                searchBy: by,
+              });
               e.currentTarget.blur();
             }
           }}
