@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { selectUser, useAppDispatch, useAppSelector } from '../../app/hooks';
+import ModalConfirm from '../../components/ModalConfirm';
 import TextInput from '../../components/TextInput';
 import { SetMenuActive } from '../../slices/ConfigSlice';
 import { PutChangePassword } from '../../slices/UserSlice';
@@ -75,12 +76,21 @@ const ChangePasswordPage = ({ name }: Props) => {
     }
   }, [formResult, setValue]);
 
+  const [modalConfirm, setModalConfirm] = useState<any | null>(null);
   const formSubmit: SubmitHandler<IFormChange> = (data) => {
     if (data?.newPassword !== data?.confirmNewPassword) {
       setError('confirmNewPassword', { message: 'Password tidak sesuai' });
       return;
     }
-    dispatch(PutChangePassword(data));
+    setModalConfirm({
+      message: 'Are you sure want to update this data?',
+      yesAction: () => {
+        setModalConfirm(null);
+        dispatch(PutChangePassword(data));
+      },
+      noAction: () => setModalConfirm(null),
+      checked: true,
+    });
   };
 
   return (
@@ -101,6 +111,7 @@ const ChangePasswordPage = ({ name }: Props) => {
           </button>
         </div>
       </form>
+      <ModalConfirm {...modalConfirm} />
     </div>
   );
 };

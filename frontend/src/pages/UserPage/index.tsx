@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { IoImageOutline } from 'react-icons/io5';
 import { selectUser, useAppDispatch, useAppSelector } from '../../app/hooks';
+import ModalConfirm from '../../components/ModalConfirm';
 
 import TextInput from '../../components/TextInput';
 import { PostUpload } from '../../slices/AuthSlice';
@@ -70,8 +71,18 @@ const UserPage = ({ name }: Props) => {
     },
   ];
 
+  const [modalConfirm, setModalConfirm] = useState<any | null>(null);
+
   const formSubmit: SubmitHandler<IFormUpdateUser> = (data) => {
-    dispatch(PutUpdateUser(data));
+    setModalConfirm({
+      message: 'Are you sure want to update this data?',
+      yesAction: () => {
+        setModalConfirm(null);
+        dispatch(PutUpdateUser(data));
+      },
+      noAction: () => setModalConfirm(null),
+      checked: true,
+    });
   };
 
   const inputFileRef = useRef<HTMLInputElement>(null);
@@ -140,6 +151,7 @@ const UserPage = ({ name }: Props) => {
     setValue('photo', linkUploaded);
     if (linkUploaded) setDispImage(linkUploaded);
   }, [linkUploaded, setValue]);
+
   return (
     <div className='flex justify-center'>
       <form className='w-full max-w-lg' onSubmit={handleSubmit(formSubmit)}>
@@ -216,6 +228,8 @@ const UserPage = ({ name }: Props) => {
           </button>
         </div>
       </form>
+
+      <ModalConfirm {...modalConfirm} />
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { IoAddSharp, IoImageOutline, IoWarningOutline } from 'react-icons/io5';
 import { selectPost, useAppDispatch, useAppSelector } from '../../app/hooks';
 import CardPost from '../../components/CardPost';
+import ModalConfirm from '../../components/ModalConfirm';
 import Pagination from '../../components/Pagination';
 import Search from '../../components/Search';
 import TextInput from '../../components/TextInput';
@@ -56,7 +57,7 @@ const PostPage = ({ name }: Props) => {
   };
 
   const [modalForm, setModalForm] = useState<null | Post | any>(null);
-  const [modalDelete, setModalDelete] = useState<null | Post | any>(null);
+  const [modalConfirm, setModalConfirm] = useState<null | any>(null);
 
   const {
     register,
@@ -160,7 +161,16 @@ const PostPage = ({ name }: Props) => {
     }
 
     if (type === 'delete') {
-      setModalDelete({ id, caption, tags, image });
+      // setModalDelete({ id, caption, tags, image });
+      setModalConfirm({
+        message: 'Are you sure want to delete this data?',
+        yesAction: () => {
+          setModalConfirm(null);
+          dispatch(DeleteDelPost(id));
+        },
+        noAction: () => setModalConfirm(null),
+        checked: true,
+      });
     }
 
     if (type === 'like') {
@@ -170,12 +180,6 @@ const PostPage = ({ name }: Props) => {
     if (type === 'unlike') {
       dispatch(PutUnLikePost(id));
     }
-  };
-
-  const OnConfirmDelete = () => {
-    if (!modalDelete?.id) return;
-    dispatch(DeleteDelPost(modalDelete?.id));
-    setModalDelete(null);
   };
 
   return (
@@ -216,36 +220,7 @@ const PostPage = ({ name }: Props) => {
         )}
       </div>
 
-      <input
-        type='checkbox'
-        id='my-modal-delete'
-        className='modal-toggle'
-        checked={modalDelete !== null}
-        onChange={() => console.log('ok')}
-      />
-      <div className='modal'>
-        <div className='modal-box'>
-          <div className='py-4 text-center'>
-            Are you sure want to delete this data ?
-          </div>
-          <div className='modal-action justify-center'>
-            <button
-              type='button'
-              className='btn btn-ghost btn-md'
-              onClick={() => setModalDelete(null)}
-            >
-              No
-            </button>
-            <button
-              onClick={() => OnConfirmDelete()}
-              type='submit'
-              className={`btn btn-primary btn-md ${loading && 'loading'}`}
-            >
-              Yes
-            </button>
-          </div>
-        </div>
-      </div>
+      <ModalConfirm {...modalConfirm} />
 
       <input
         type='checkbox'
