@@ -82,6 +82,7 @@ export const AuthSlice = createSlice({
     },
     ClearFormResult(state: AuthState) {
       state.formResult = null;
+      state.linkUploaded = '';
     },
   },
   extraReducers: ({ addCase }) => {

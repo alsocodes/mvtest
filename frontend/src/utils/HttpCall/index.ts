@@ -1,8 +1,7 @@
 import axios from 'axios';
 import { store } from '../../app/store';
+import { Logout } from '../../slices/AuthSlice';
 import { SetProgress, SetToastData } from '../../slices/ConfigSlice';
-// import { Logout, LogoutLocal, RefreshLogin } from '../../slices/AuthSlice';
-// import { SetProgress, SetToastData } from '../../slices/ConfigSlice';
 
 const axiosApiInstance = axios.create({
   baseURL: 'http://localhost:9001',
@@ -31,24 +30,9 @@ axiosApiInstance.interceptors.response.use(
   },
   async function (error) {
     store.dispatch(SetProgress(false));
-    // if (error.response.status === 401) {
-    //   const originalRequest = error.config;
-    //   const userData = store.getState().auth.userData;
-    //   if (
-    //     !originalRequest._retry &&
-    //     userData?.refreshToken &&
-    //     !['/auth/refresh-login', '/auth/logout'].includes(error.config.url)
-    //   ) {
-    //     originalRequest._retry = true;
-    //     const { payload }: any = await store.dispatch(RefreshLogin());
-    //     // console.log("xp", payload.token);
-
-    //     axios.defaults.headers.common['Authorization'] =
-    //       'Bearer ' + payload.token;
-    //     return axiosApiInstance(originalRequest);
-    //   }
-    //   store.dispatch(LogoutLocal());
-    // }
+    if (error.response.status === 401) {
+      store.dispatch(Logout());
+    }
 
     const message = error.response.data.message;
     const getMethod = error.config.method === 'get';

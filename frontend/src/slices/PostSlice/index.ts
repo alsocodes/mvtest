@@ -77,7 +77,7 @@ export const GetPosts = createAsyncThunk(
     if (query.search === '') delete query.search;
     if (query.searchBy === '') delete query.searchBy;
     // if(query.searchBy === )
-    console.log(query);
+    // console.log(query);
     const userId = decoded?.sub;
     const { data, pagination } = (
       await HttpCall.get(`/post/user/${userId}`, { params: query })

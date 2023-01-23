@@ -4,7 +4,7 @@ import './index.css';
 import reportWebVitals from './reportWebVitals';
 import { Provider } from 'react-redux';
 import { store, PersistGate, persistor } from './app/store';
-import App from './_App';
+import App from './App';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
