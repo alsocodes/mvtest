@@ -62,6 +62,15 @@ export class AuthController {
     };
   }
 
+  @Post('logout')
+  async logout() {
+    return {
+      success: true,
+      message: 'Successfully logout',
+      data: null,
+    };
+  }
+
   @PublicRoute()
   @Post('upload')
   @UseInterceptors(
