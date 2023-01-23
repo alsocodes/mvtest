@@ -10,6 +10,8 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
 
   const { HOST, PORT } = process.env;
-  await app.listen(PORT, HOST);
+  const port = PORT || 9001;
+  const host = HOST || 'localhost';
+  await app.listen(port, host);
 }
 bootstrap();

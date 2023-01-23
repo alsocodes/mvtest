@@ -21,6 +21,7 @@ import { PublicRoute } from './constants';
 import { LoginDTO } from './dto/login.dto';
 import { RegisterDTO } from './dto/register.dto';
 import { LocalAuthGuard } from './guard/local-auth.guard';
+import { LoginToken } from './type/login-token.type';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -44,8 +45,13 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @ApiBody({ type: LoginDTO })
-  async login(@Request() req) {
-    const token = await this.authService.login(req.user);
+  login(@Request() req) {
+    const { id, username } = req.user;
+    const payload: LoginToken = {
+      sub: id,
+      username: username,
+    };
+    const token = this.authService.loginToken(payload);
 
     return {
       success: true,

@@ -4,6 +4,7 @@ import { UserService } from 'src/user/user.service';
 import { jwtConstants } from './constants';
 import { RegisterDTO } from './dto/register.dto';
 import * as bcrypt from 'bcrypt';
+import { LoginToken } from './type/login-token.type';
 
 @Injectable()
 export class AuthService {
@@ -25,21 +26,13 @@ export class AuthService {
     return result;
   }
 
-  async login(user: any) {
-    const token = await this.generateToken({
-      username: user.username,
-      sub: user.id,
-    });
-
-    return token;
-  }
-
-  async generateToken(data: any) {
+  loginToken(payload: LoginToken) {
+    if (!payload) throw new Error();
     const { access_token_expires, access_token_secret } = jwtConstants;
 
     return this.jwtService.sign(
       {
-        ...data,
+        ...payload,
       },
       {
         secret: access_token_secret,

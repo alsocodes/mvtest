@@ -20,7 +20,7 @@ export class UserService {
   }
 
   findByUsername(username: string) {
-    return this.prisma.user.findFirst({ where: { username } });
+    return this.prisma.user.findUnique({ where: { username } });
   }
 
   async create(registerDTO: RegisterDTO) {
@@ -91,7 +91,7 @@ export class UserService {
     }
   }
 
-  async findById(id: number) {
+  async findById(id: number): Promise<any> {
     return this.prisma.user.findUnique({ where: { id } });
   }
 }
