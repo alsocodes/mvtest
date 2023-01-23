@@ -248,7 +248,7 @@ export class PostService {
   async getById(id: number) {
     try {
       const post = await this.prismaService.post.findUnique({
-        where: { id },
+        where: { id: Number(id) },
         select: {
           id: true,
           caption: true,

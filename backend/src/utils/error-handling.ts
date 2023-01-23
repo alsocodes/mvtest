@@ -20,11 +20,11 @@ export class ErrorHandling {
       if (code === 'P2002') {
         const { target }: any = meta;
         const message = target?.join(', ');
-        throw new ConflictException(`${message} sudah digunakan`);
+        throw new ConflictException(`${message} already in used`);
       }
 
       if (code === 'P2025') {
-        throw new NotFoundException('Data yang akan dihapus tidak ditemukan');
+        throw new NotFoundException('Data not found');
       }
     }
 
@@ -36,14 +36,14 @@ export class ErrorHandling {
         const pos = message.indexOf(keyUnknown) + keyUnknown.length;
         let messageInfo = message.substring(pos);
         messageInfo = messageInfo.substring(0, messageInfo.indexOf('`'));
-        throw new BadRequestException(`Parameter ${messageInfo} tidak valid`);
+        throw new BadRequestException(`Parameter ${messageInfo} is invalid`);
       }
 
       // nanti kalau ketemu error unknown lainnya bisa ditambah lagi disini
     }
 
     if (error instanceof NotFoundException)
-      throw new NotFoundException(error.message || 'Data tidak ditemukan');
+      throw new NotFoundException(error.message || 'Data not found');
 
     throw error;
     // console.log(error);

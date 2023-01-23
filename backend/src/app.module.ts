@@ -10,6 +10,7 @@ import { AppService } from './app.service';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { PostModule } from './post/post.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { PostModule } from './post/post.module';
       serveRoot: '/uploads/',
     }),
     PostModule,
+    ConfigModule.forRoot({ isGlobal: true }),
   ],
   controllers: [AppController],
   providers: [

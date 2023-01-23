@@ -143,6 +143,20 @@ export class PostController {
     }
   }
 
+  @Get(':id')
+  async getOne(@Param('id') postId: number) {
+    try {
+      const post = await this.postService.getById(postId);
+      return {
+        success: true,
+        message: 'Successfully Get Post',
+        data: post,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
   @Get('/user/:id')
   async getAllByUser(@Query() query: QueryDTO, @Param('id') userId: number) {
     try {
