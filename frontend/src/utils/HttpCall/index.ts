@@ -3,8 +3,9 @@ import { store } from '../../app/store';
 import { Logout } from '../../slices/AuthSlice';
 import { SetProgress, SetToastData } from '../../slices/ConfigSlice';
 
+const apiUrl = process.env.REACT_APP_API_URL;
 const axiosApiInstance = axios.create({
-  baseURL: 'http://localhost:9001',
+  baseURL: apiUrl,
   timeout: 30000,
 });
 
