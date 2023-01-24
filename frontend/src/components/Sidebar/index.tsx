@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { IoHomeOutline, IoLogOutOutline } from 'react-icons/io5';
+import { IoHomeOutline, IoLogOutOutline, IoMenuOutline } from 'react-icons/io5';
 import { IconType } from 'react-icons';
 import { selectConfig, useAppDispatch, useAppSelector } from '../../app/hooks';
 import { Logout } from '../../slices/AuthSlice';
@@ -81,10 +81,27 @@ const Sidebar = ({ children }: Props) => {
     dispatch(Logout());
   };
 
+  const [toggle, setToggle] = useState(false);
+  useEffect(() => {
+    setToggle(false);
+  }, [menuActive]);
+
   return (
-    <div className='flex h-full border bg-base-100 text-base-content w-full'>
+    <div className='flex h-full border bg-base-100 text-base-content w-full relative'>
+      <div
+        onClick={() => setToggle(false)}
+        className={`fixed top-0 right-0 left-0 bottom-0
+         bg-black bg-opacity-50 z-10
+         transition-all
+         duration-300
+         ${!toggle && 'hidden'}
+         `}
+      />
       <aside
         className={`
+          absolute top-0 bottom-0 ${toggle ? 'left-0' : '-left-full'}
+          z-20
+          md:static
           flex-shrink-0
           w-60 bg-base-300 sidebar transition-all duration-300 ease-in-out overflow-hidden`}
       >
@@ -112,7 +129,18 @@ const Sidebar = ({ children }: Props) => {
       </aside>
       {/* flexx flex-colx */}
       <main className='main flex-grow transition-all duration-150 ease-in'>
-        <div className='main-content px-12 py-6 border h-full'>{children}</div>
+        <div className='h-full flex flex-col pb-2 md:pb-0'>
+          <button
+            className={`btn btn-circle btn-ghost  md:hidden`}
+            onClick={() => setToggle(true)}
+          >
+            <IoMenuOutline size={24} />
+          </button>
+          {/* <div className='main-content px-12 py-6 border h-full'>{children}</div> */}
+          <div className='main-content px-4 p4-6 md:px-12 md:py-12 h-full'>
+            {children}
+          </div>
+        </div>
       </main>
     </div>
   );

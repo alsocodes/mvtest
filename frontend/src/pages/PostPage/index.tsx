@@ -201,7 +201,7 @@ const PostPage = ({ name }: Props) => {
           </div>
         ) : (
           <>
-            <div className='flex-grow h-80 overflow-y-auto pr-4'>
+            <div className='flex-grow h-80 overflow-y-auto'>
               <div className='grid grid-cols-1 gap-y-6 gap-x-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8'>
                 {data?.map((row: Post) => {
                   return (

@@ -94,7 +94,7 @@ const ChangePasswordPage = ({ name }: Props) => {
   };
 
   return (
-    <div className='flex justify-center'>
+    <div className='flex justify-center h-full overflow-y-auto'>
       <form className='w-full max-w-lg' onSubmit={handleSubmit(formSubmit)}>
         <div className='flex flex-row items-center justify-center lg:justify-start mb-2'>
           <p className='text-xl text-center w-full text-black py-2'>

@@ -1,7 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { IoImageOutline } from 'react-icons/io5';
-import { selectUser, useAppDispatch, useAppSelector } from '../../app/hooks';
+import {
+  selectAuth,
+  selectUser,
+  useAppDispatch,
+  useAppSelector,
+} from '../../app/hooks';
 import ModalConfirm from '../../components/ModalConfirm';
 
 import TextInput from '../../components/TextInput';
@@ -23,8 +28,9 @@ type Props = {
 
 const UserPage = ({ name }: Props) => {
   const dispatch = useAppDispatch();
-  const { data, linkUploaded, uploading, formResult } =
-    useAppSelector(selectUser);
+  const { data, formResult } = useAppSelector(selectUser);
+
+  const { linkUploaded, uploading } = useAppSelector(selectAuth);
 
   useEffect(() => {
     dispatch(SetMenuActive(name));
@@ -153,7 +159,7 @@ const UserPage = ({ name }: Props) => {
   }, [linkUploaded, setValue]);
 
   return (
-    <div className='flex justify-center'>
+    <div className='flex justify-center h-full overflow-y-auto'>
       <form className='w-full max-w-lg' onSubmit={handleSubmit(formSubmit)}>
         <div className='flex flex-row items-center justify-center lg:justify-start mb-2'>
           <p className='text-xl text-center w-full text-black py-2'>

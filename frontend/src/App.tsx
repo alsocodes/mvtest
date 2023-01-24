@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import {
   selectAuth,
@@ -71,9 +71,28 @@ const App = () => {
     dispatch(SetToastData(null));
   }, [toastData, dispatch]);
 
+  const [progressValue, setProgressValue] = useState(0);
+  useEffect(() => {
+    if (!progress) {
+      setProgressValue(100);
+      const sto = setTimeout(() => setProgressValue(0), 10);
+      return () => clearTimeout(sto);
+    } else {
+      setProgressValue(10);
+      const sto1 = setTimeout(() => {
+        setProgressValue(95);
+        // const sto2 = setTimeout(() => setProgressValue(95), 100);
+        // return clearTimeout(sto2);
+      }, 100);
+
+      return () => clearTimeout(sto1);
+    }
+  }, [progress]);
+  // console.log(progress);
+
   return (
     <div>
-      <Progressbar progress={progress} />
+      <Progressbar progressValue={progressValue} />
       <BrowserRouter>
         {!loggedIn ? (
           <Routes>

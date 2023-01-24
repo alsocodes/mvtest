@@ -26,10 +26,6 @@ const RegisterPage = () => {
   const dispatch = useAppDispatch();
   const { linkUploaded, uploading, formResult } = useAppSelector(selectAuth);
 
-  // useEffect(() => {
-
-  // }, [dispatch]);
-
   const {
     register,
     handleSubmit,
@@ -148,13 +144,17 @@ const RegisterPage = () => {
   };
 
   useEffect(() => {
+    dispatch(ClearFormResult());
+  }, [dispatch]);
+
+  useEffect(() => {
     setValue('photo', linkUploaded);
     if (linkUploaded) setDispImage(linkUploaded);
   }, [linkUploaded, setValue]);
   return (
     <section className='h-screen'>
       <div className='flex justify-center items-center flex-wrap h-full g-6 py-4'>
-        <div className='w-full max-w-lg py-10 px-20 border border-primary rounded-lg'>
+        <div className='w-full max-w-lg py-6 md:py-10 px-6 md:px-20 mx-6 md:mx-0 border border-primary rounded-lg'>
           <div className='items-center justify-center flex w-full h-full flex-grow'>
             <form className='w-full' onSubmit={handleSubmit(formSubmit)}>
               <div className='flex flex-row items-center justify-center lg:justify-start mb-2'>

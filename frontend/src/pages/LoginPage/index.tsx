@@ -52,8 +52,7 @@ const LoginPage = () => {
   return (
     <section className='h-screen'>
       <div className='flex justify-center items-center flex-wrap h-full g-6'>
-        {/* <div className='xl:w-5/12 lg:w-5/12 md:w-8/12 w-full py-10 px-20 border border-primary rounded-lg'> */}
-        <div className='w-full max-w-lg py-10 px-20 border border-primary rounded-lg'>
+        <div className='w-full max-w-lg py-6 md:py-10 px-6 md:px-20 mx-6 md:mx-0 border border-primary rounded-lg'>
           <div className='items-center justify-center flex w-full h-full flex-grow'>
             <form className='w-full' onSubmit={handleSubmit(formSubmit)}>
               <div className='flex flex-row items-center justify-center lg:justify-start mb-2'>

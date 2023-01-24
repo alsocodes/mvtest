@@ -14,7 +14,7 @@ const ModalConfirm = ({ checked, message, noAction, yesAction }: Props) => {
         type='checkbox'
         id='my-modal-confirm'
         className='modal-toggle'
-        checked={checked}
+        checked={!!checked}
         onChange={() => console.log('ok')}
       />
       <div className='modal'>
