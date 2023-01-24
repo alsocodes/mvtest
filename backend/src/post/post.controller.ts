@@ -22,8 +22,10 @@ import { diskStorage } from 'multer';
 import * as path from 'path';
 import * as sharp from 'sharp';
 import * as fs from 'fs';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('post')
+@ApiTags('Post')
 export class PostController {
   constructor(private readonly postService: PostService) {}
 

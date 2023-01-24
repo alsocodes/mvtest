@@ -6,11 +6,13 @@ import {
   Put,
   Request,
 } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ChangePasswordDTO } from './dto/change-password.dto';
 import { UpdateUserDTO } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
 @Controller('user')
+@ApiTags('User')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -33,6 +35,7 @@ export class UserController {
   }
 
   @Put('/')
+  @ApiOperation({ summary: 'Update User' })
   async update(@Body() updateUserDTO: UpdateUserDTO, @Request() req) {
     const { id } = req.user;
 
