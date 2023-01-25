@@ -92,6 +92,18 @@ Start Development Server
   npm run start:dev
 
 ```
+
+### Documentation
+
+Api [Documentation](https://documenter.getpostman.com/view/2198742/2s8ZDcxJzX)
+or go to your backend dev server with /docs, example you run at localhost and 9001 port : 
+
+```
+http://localhost:9001/docs
+username: dev
+password: dev
+```
+
 ## Demo
 
 https://mvtest.alsoproject.my.id/
